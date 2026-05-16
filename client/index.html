@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Społecznościowy</title>
+    <!-- Podłączenie zewnętrznego arkusza stylów -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <!-- Lewe menu: Opcje profilu i wyszukiwarki -->
+            <div class="dropdown">
+                <button class="dropbtn">Mój Profil / Ustawienia</button>
+                <div class="dropdown-content">
+                    <a href="#profile">Mój profil</a>
+                    <a href="#settings">Ustawienia</a>
+                    <a href="#search">Szukaj i obserwuj</a>
+                </div>
+            </div>
+            
+            <h1>Rabbit</h1>
+
+            <!-- Prawe menu: Rozwijana lista znajomych po najechaniu -->
+            <div class="dropdown">
+                <button class="dropbtn">Lista znajomych</button>
+                <div class="dropdown-content">
+                    <a href="#friend1">Jan Kowalski</a>
+                    <a href="#friend2">Anna Nowak</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <!-- Sekcja autoryzacji: Rejestracja i Logowanie -->
+        <section id="auth-section" class="panel">
+            <h2>Logowanie i Rejestracja</h2>
+            
+            <div class="auth-forms">
+                <!-- Formularz logowania -->
+                <form id="loginForm" class="form-box">
+                    <h3>Zaloguj się</h3>
+                    <label for="loginId">Login lub e-mail:</label>
+                    <input type="text" id="loginId" name="login" required>
+                    
+                    <label for="loginPassword">Hasło:</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                    
+                    <button type="submit">Zaloguj</button>
+                    <div id="loginMessage"></div>
+                </form>
+
+                <!-- Formularz rejestracji -->
+                <form id="registerForm" class="form-box">
+                    <h3>Zarejestruj się</h3>
+                    <label for="regUsername">Login:</label>
+                    <input type="text" id="regUsername" name="username" required>
+                    
+                    <label for="regEmail">E-mail:</label>
+                    <input type="email" id="regEmail" name="email" required>
+                    
+                    <label for="regPassword">Hasło:</label>
+                    <input type="password" id="regPassword" name="password" required>
+                    
+                    <label for="regPassword2">Potwierdź hasło:</label>
+                    <input type="password" id="regPassword2" name="password2" required>
+                    
+                    <button type="submit">Zarejestruj</button>
+                    <div id="registerMessage"></div>
+                </form>
+            </div>
+        </section>
+
+        <section id="add-post-section" class="panel">
+    <h3>Dodaj nowy post</h3>
+    <!-- Formularz wstawiania posta -->
+    <form id="addPostForm">
+        <!-- Tymczasowe ukryte pole dla ID autora. Docelowo identyfikator będzie pobierany z sesji na serwerze -->
+        <input type="hidden" id="postOwnerId" value="1">
+        
+        <textarea id="postContent" placeholder="Co ci chodzi po głowie?" required style="width: 100%; height: 60px; margin-bottom: 10px;"></textarea>
+        <button type="submit">Opublikuj</button>
+        <p id="postMessage"></p>
+    </form>
+        </section>
+
+        <!-- Strona główna: Tablica z postami -->
+        <section id="feed-section" class="panel">
+            <h2>Tablica (Posty)</h2>
+            <p>Tutaj będą pojawiać się posty innych użytkowników...</p>
+            <!-- Miejsce na dynamicznie dodawane elementy w JS -->
+        </section>
+    </main>
+
+    <!-- Prywatny czat na dole strony -->
+    <aside id="chat-window" class="chat-panel">
+        <div class="chat-header">Prywatny czat</div>
+        <div class="chat-messages">
+            <p>Wybierz znajomego, aby rozpocząć czat...</p>
+        </div>
+        <input type="text" placeholder="Napisz wiadomość...">
+        <button>Wyślij</button>
+    </aside>
+
+    <footer>
+        <p>&copy; 2026 Mój Portal Społecznościowy</p>
+    </footer>
+
+    <!-- Skrypt JS (na razie pusty plik) -->
+    <script src="scripts/main.js"></script>
+</body>
+</html>
