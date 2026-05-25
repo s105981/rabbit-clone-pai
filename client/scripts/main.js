@@ -1,59 +1,54 @@
 // client/scripts/main.js
 document.addEventListener('DOMContentLoaded', () => {
+    const initialAddPostSection = document.getElementById('add-post-section');
+    if (initialAddPostSection) {
+        initialAddPostSection.style.display = 'none';
+    }
+   const addPostForm = document.getElementById('addPostForm');
+    const postMessage = document.getElementById('postMessage');
 
-    const addPostForm = document.getElementById('addPostForm');
-const postMessage = document.getElementById('postMessage');
+    if (addPostForm) {
+        addPostForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Zapobiega przeładowaniu strony [2]
 
-if (addPostForm) {
-    addPostForm.addEventListener('submit', async (event) => {
-        // Zablokowanie domyślnego zachowania przeglądarki (przeładowania strony) [9]
-        event.preventDefault();
+            const content = document.getElementById('postContent').value.trim();
 
-        // Pobranie wartości i walidacja po stronie klienta (usuwanie białych znaków) [11]
-        const content = document.getElementById('postContent').value.trim();
-        const owner_id = document.getElementById('postOwnerId').value;
-
-        if (content.length === 0) {
-            postMessage.textContent = 'Treść posta nie może być pusta.';
-            postMessage.style.color = 'red';
-            return;
-        }
-
-        const data = { owner_id, content };
-
-        try {
-            // Asynchroniczne wysłanie danych formularza do serwera metodą POST [10]
-            const response = await fetch('http://localhost:3000/api/posts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            // Odczytanie odpowiedzi w formacie JSON [12]
-            const result = await response.json();
-
-            if (!response.ok) {
-                postMessage.textContent = `Błąd: ${result.message}`;
+            if (content.length === 0) {
+                postMessage.textContent = 'Treść posta nie może być pusta.';
                 postMessage.style.color = 'red';
                 return;
             }
 
-            // Komunikat o sukcesie
-            postMessage.textContent = result.message;
-            postMessage.style.color = 'green';
-            
-            // Wyczyszczenie pola tekstowego formularza po poprawnym wysłaniu danych [13]
-            addPostForm.reset();
-            
-            // Dynamiczne odświeżenie interfejsu - ponowne pobranie postów z bazy [12, 14]
-            loadPosts(); 
+            // Nie podajemy owner_id, serwer bierze to bezpiecznie z sesji [1]
+            const data = { content };
 
-        } catch (err) {
-            postMessage.textContent = 'Błąd połączenia z serwerem.';
-            postMessage.style.color = 'red';
-        }
-    });
-}
+            try {
+                const response = await fetch('http://localhost:3000/api/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    postMessage.textContent = `Błąd: ${result.message}`;
+                    postMessage.style.color = 'red';
+                    return;
+                }
+
+                postMessage.textContent = result.message;
+                postMessage.style.color = 'green';
+                addPostForm.reset();
+                loadPosts(); // Odświeżenie tablicy z postami po sukcesie
+
+            } catch (err) {
+                postMessage.textContent = 'Błąd połączenia z serwerem.';
+                postMessage.style.color = 'red';
+            }
+        });
+    }
 
     // Funkcja pobierająca i wyświetlająca posty
 async function loadPosts() {
@@ -183,11 +178,11 @@ loadPosts();
 
     // --- OBSŁUGA LOGOWANIA ---
     const loginForm = document.getElementById('loginForm');
-    const loginMessage = document.getElementById('loginMessage'); // Musisz dodać <div id="loginMessage"> w HTML pod logowaniem
+    const loginMessage = document.getElementById('loginMessage'); 
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+            event.preventDefault(); // Zapobiega przeładowaniu strony
 
             const login = document.getElementById('loginId').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -196,6 +191,7 @@ loadPosts();
                 const response = await fetch('http://localhost:3000/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ login, password })
                 });
 
@@ -207,14 +203,134 @@ loadPosts();
                     return;
                 }
 
+                // Sukces logowania
                 loginMessage.textContent = result.message;
                 loginMessage.style.color = 'green';
                 
-                // Tutaj w przyszłości dodamy ukrywanie panelu logowania i pobieranie postów
+                // 1. POBRANIE SEKCJI AUTORYZACJI I JEJ UKRYCIE
+                const authSection = document.getElementById('auth-section');
+if (authSection) {
+    authSection.style.display = 'none'; 
+}
+
+// 2. POKAZANIE MENU PROFILU (z opcją wylogowania)
+const profileMenu = document.getElementById('profileMenu');
+if (profileMenu) {
+    profileMenu.style.display = 'inline-block'; 
+}
+const addPostSection = document.getElementById('add-post-section');
+if (addPostSection) {
+    addPostSection.style.display = 'block'; // Pokazuje formularz postów
+}
+
+loadPosts(); // odświeżenie danych
+
+                // 2. ODŚWIEŻENIE DANYCH (opcjonalnie)
+                // Skoro użytkownik jest już zalogowany, możemy pobrać posty lub jego dane
+                loadPosts(); 
+                
             } catch (err) {
                 loginMessage.textContent = 'Błąd połączenia z serwerem.';
                 loginMessage.style.color = 'red';
             }
         });
     }
+
+    // --- OBSŁUGA WYLOGOWANIA ---
+    const logoutBtn = document.getElementById('logoutBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    const authSection = document.getElementById('auth-section'); 
+    const addPostSection = document.getElementById('add-post-section'); // <--- DODANO POBIERANIE SEKCJI
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (event) => {
+            event.preventDefault(); 
+
+            try {
+                const response = await fetch('http://localhost:3000/api/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    if (authSection) {
+                        authSection.style.display = 'block'; 
+                    }
+                    if (profileMenu) {
+                        profileMenu.style.display = 'none';
+                    }
+                    
+                    // DODANO: Ukrywanie formularza dodawania postów po wylogowaniu
+                    if (addPostSection) {
+                        addPostSection.style.display = 'none';
+                    }
+
+                    // Czyszczenie ew. wiadomości na ekranie
+                    const loginMessage = document.getElementById('loginMessage');
+                    if (loginMessage) loginMessage.textContent = '';
+                    
+                    const postMessage = document.getElementById('postMessage');
+                    if (postMessage) postMessage.textContent = '';
+
+                    alert('Wylogowano pomyślnie.');
+                } else {
+                    alert('Wystąpił błąd podczas wylogowywania.');
+                }
+            } catch (err) {
+                console.error('Błąd połączenia z serwerem:', err);
+            }
+        });
+    }
+
+    // Funkcja realizująca asynchroniczną komunikację klient-serwer
+async function loadExternalData() {
+    // 1. Pobranie kontenera na dane z drzewa DOM
+    const apiContainer = document.getElementById('apiContainer');
+
+    try {
+        // 2. Wysłanie asynchronicznego żądania GET do publicznego API
+        const response = await fetch('https://api.nbp.pl/api/exchangerates/tables/A/');
+
+        // 3. Sprawdzenie kodów statusu odpowiedzi (czy zakończyła się sukcesem)
+        if (!response.ok) {
+            throw new Error('Błąd pobierania danych');
+        }
+
+        // 4. Odczytanie danych w formacie JSON
+        const data = await response.json();
+
+        // 5. Dynamiczna aktualizacja interfejsu użytkownika na podstawie odpowiedzi
+        // 5. Wyciągnięcie kursów walut
+        // API NBP zwraca główną odpowiedź jako tablicę, interesuje nas pierwszy element: data[0]
+        // Właściwe kursy znajdują się w wewnętrznej tablicy "rates"
+        const rates = data[0].rates;
+
+        // Szukamy konkretnych walut (np. Dolar i Euro) po ich kodzie
+        const usd = rates.find(rate => rate.code === 'USD');
+        const eur = rates.find(rate => rate.code === 'EUR');
+        const chf = rates.find(rate => rate.code === 'CHF');
+        const gbp = rates.find(rate => rate.code === 'GBP');
+        const tryy = rates.find(rate => rate.code === 'TRY');
+
+        // 6. Dynamiczna aktualizacja interfejsu użytkownika
+        // Zamiast textContent używamy innerHTML, aby móc dodać tagi HTML (np. <br> i <strong>)
+        apiContainer.innerHTML = `
+            <strong>Aktualne kursy z tabeli A:</strong><br>
+            Dolar amerykański (USD): ${usd.mid} PLN<br>
+            Euro (EUR): ${eur.mid} PLN<br>
+            Frank Szwajcarski (CHF): ${chf.mid} PLN<br>
+            Funt Brytyjski (GBP): ${gbp.mid} PLN<br>
+            Lira Turecka (TRY): ${tryy.mid} PLN<br>
+        `;
+        apiContainer.style.color = '#333';
+        
+    } catch (err) {
+        // 6. Obsługa błędów komunikacji i wyświetlenie informacji o niepowodzeniu
+        apiContainer.textContent = 'Błąd połączenia z zewnętrznym API.';
+        apiContainer.style.color = 'red';
+    }
+}
+
+    loadExternalData();
 });
+

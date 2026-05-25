@@ -10,17 +10,20 @@
 <body>
     <header>
         <nav class="navbar">
-            <!-- Lewe menu: Opcje profilu i wyszukiwarki -->
-            <div class="dropdown">
-                <button class="dropbtn">Mój Profil / Ustawienia</button>
-                <div class="dropdown-content">
-                    <a href="#profile">Mój profil</a>
-                    <a href="#settings">Ustawienia</a>
-                    <a href="#search">Szukaj i obserwuj</a>
-                </div>
-            </div>
-            
+            <!-- Lewe menu: Opcje profilu i wyszukiwarki (domyślnie ukryte) -->
+<div class="dropdown" id="profileMenu" style="display: none;">
+    <button class="dropbtn">Mój Profil / Ustawienia</button>
+    <div class="dropdown-content">
+        <a href="#profile">Mój profil</a>
+        <a href="#settings">Ustawienia</a>
+        <a href="#search">Szukaj i obserwuj</a>
+        <!-- Przycisk wylogowania zintegrowany z listą -->
+        <a href="#" id="logoutBtn" style="color: red; font-weight: bold; border-top: 1px solid #ddd;">Wyloguj</a>
+    </div>
+</div>
+
             <h1>Rabbit</h1>
+
 
             <!-- Prawe menu: Rozwijana lista znajomych po najechaniu -->
             <div class="dropdown">
@@ -30,7 +33,16 @@
                     <a href="#friend2">Anna Nowak</a>
                 </div>
             </div>
+        
         </nav>
+        
+
+        <div id="external-api-section" class="panel">
+    <h3>Ciekawostka / Cytat</h3>
+    <!-- Kontener przeznaczony na wyświetlanie wyników z zewnętrznego API -->
+    <p id="apiContainer">Ładowanie danych...</p>
+</div>
+
     </header>
 
     <main class="main-container">
@@ -73,12 +85,11 @@
             </div>
         </section>
 
-        <section id="add-post-section" class="panel">
+        <section id="add-post-section" class="panel" style="display: none;">
     <h3>Dodaj nowy post</h3>
     <!-- Formularz wstawiania posta -->
     <form id="addPostForm">
-        <!-- Tymczasowe ukryte pole dla ID autora. Docelowo identyfikator będzie pobierany z sesji na serwerze -->
-        <input type="hidden" id="postOwnerId" value="1">
+        <!-- Tymczasowe ukryte pole dla ID autora. Docelowo identyfikator będzie pobierany z sesji na serwerze -->  
         
         <textarea id="postContent" placeholder="Co ci chodzi po głowie?" required style="width: 100%; height: 60px; margin-bottom: 10px;"></textarea>
         <button type="submit">Opublikuj</button>
