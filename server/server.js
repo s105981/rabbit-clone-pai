@@ -189,3 +189,5 @@ app.get('/api/posts', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Serwer działa na porcie http://localhost:${PORT}`);
 });
+
+module.exports = app;
